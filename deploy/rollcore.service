@@ -1,0 +1,17 @@
+[Unit]
+Description=Rollcore
+After=network.target
+
+[Service]
+Type=simple
+User=rollcore
+WorkingDirectory=/opt/rollcore
+EnvironmentFile=/etc/rollcore.env
+ExecStart=/usr/bin/node server.js
+Restart=on-failure
+RestartSec=3
+StateDirectory=rollcore
+NoNewPrivileges=true
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,45 @@
+{
+  "name": "rollcore",
+  "version": "5.2.0",
+  "private": true,
+  "description": "Rollcore — универсальный движок колеса апгрейда предметов: Node.js сервер, вход через Steam (OpenID 2.0), React-интерфейс",
+  "scripts": {
+    "start": "node server.js",
+    "build": "node build.js",
+    "items": "node tools/build-items.js",
+    "watch": "node build.js --watch",
+    "admin": "node admin.js"
+  },
+  "dependencies": {
+    "openid": "^2.0.10",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "react-icons": "^5.5.0"
+  },
+  "optionalDependencies": {
+    "steam-user": "^5.0.0",
+    "steamcommunity": "^3.48.0",
+    "steam-totp": "^2.1.2",
+    "steam-tradeoffer-manager": "^2.10.7"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  },
+  "engines": {
+    "node": ">=22.13"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/repixey/Rollcore.git"
+  },
+  "keywords": [
+    "nodejs",
+    "react",
+    "sqlite",
+    "game-engine",
+    "steam",
+    "openid",
+    "self-hosted"
+  ]
+}

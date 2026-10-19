@@ -1,0 +1,21 @@
+:root{--bg:#1a1b26;--surface:#1f2335;--line:#2f334d;--text:#e6ebff;--muted:#a8b1d8;--accent:#7aa2f7;--gold:#e8b743;--danger:#f7768e}
+*{box-sizing:border-box;margin:0}
+html{color-scheme:dark}
+body{min-height:100vh;min-height:100dvh;display:grid;place-items:center;padding:24px 20px;background:radial-gradient(ellipse at 50% 30%,#242942 0,var(--bg) 60%);color:var(--text);font:500 16px/1.5 'Rubik',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;-webkit-font-smoothing:antialiased}
+.chk{width:100%;max-width:380px;display:grid;justify-items:center;gap:10px;text-align:center}
+.chk-brand{display:inline-flex;align-items:center;gap:10px;margin-bottom:6px;font-weight:800;font-size:15px;letter-spacing:.12em}
+.chk-art{width:min(220px,62vw);aspect-ratio:1;display:grid;place-items:center}
+.chk-art img{width:100%;height:100%;object-fit:contain;display:block}
+h1{font-size:20px;font-weight:600;letter-spacing:-.01em}
+.chk-msg{min-height:1.5em;color:var(--muted);font-size:15px;font-weight:600}
+.chk-bar{width:100%;height:8px;margin-top:6px;border-radius:99px;background:var(--surface);border:1px solid var(--line);overflow:hidden}
+.chk-bar i{display:block;width:0;height:100%;border-radius:99px;background:linear-gradient(90deg,#d4181c,#ff5a5e,#d4181c);background-size:200% 100%;animation:shine 1.4s linear infinite}
+@keyframes shine{to{background-position:-200% 0}}
+.chk-note{font-size:12.5px;color:var(--muted)}
+.chk-error{color:var(--danger);font-size:14px}
+.chk-retry{margin-top:4px;padding:10px 22px;border:0;border-radius:10px;background:var(--accent);color:#16161e;font:600 14px/1 'Rubik',system-ui,sans-serif;cursor:pointer}
+.chk-retry:hover{background:#8db0fa}
+.chk.fail h1{color:var(--danger)}
+.chk.fail .chk-bar i{background:var(--danger);animation:none}
+.chk.done .chk-bar i{animation:none}
+@media (prefers-reduced-motion:reduce){.chk-bar i{animation:none}}

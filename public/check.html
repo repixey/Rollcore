@@ -1,0 +1,27 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="theme-color" content="#1a1b26">
+<title>Проверка браузера — %BRAND%</title>
+<link rel="icon" type="image/svg+xml" href="/img/logo.svg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/check.css">
+</head>
+<body>
+<main class="chk">
+  <div class="chk-art"><img id="art" src="/img/loader.svg" alt="" width="200" height="200"></div>
+  <h1 id="title">Проверяем браузер…</h1>
+  <p id="msg" class="chk-msg" role="status" aria-live="polite">Ставим варды на входе…</p>
+  <div class="chk-bar" role="progressbar" aria-label="Проверка" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><i id="bar"></i></div>
+  <p id="note" class="chk-note">Защита от ботов и перегрузки. Это займёт пару секунд.</p>
+  <button id="retry" class="chk-retry" type="button" hidden>Повторить</button>
+  <noscript><p class="chk-error">Для работы сайта нужен JavaScript.</p></noscript>
+</main>
+<script src="/assets/check.js"></script>
+</body>
+</html>

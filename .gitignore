@@ -1,0 +1,9 @@
+node_modules/
+data/
+public/assets/app.js
+public/assets/app.css
+.env
+*.log
+.DS_Store
+*.env
+!deploy/*.env.example
