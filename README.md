@@ -1,12 +1,12 @@
 # Rollcore
 
-[English](README.md) | [Русский](README.ru.md)
+[English](README.en.md) | Русский
 
-A universal engine for item upgrade wheel sites. The player stakes value from their balance, picks a more expensive item from the catalog and spins the wheel. The engine is not tied to any game: catalog, site name, currency, house edge and the game used for deposits are set in one file, `rollcore.config.js`. A sample Dota 2 catalog is included. The server is plain Node.js with no framework, the interface is React. Sign-in is Steam only (OpenID 2.0), no API key needed.
+Универсальный движок колеса апгрейда предметов. Игрок ставит стоимость с баланса, выбирает предмет подороже из каталога и крутит колесо. Движок не привязан к игре: каталог, название сайта, валюта, комиссия и игра для депозитов задаются в одном файле `rollcore.config.js`. В комплекте пример каталога для Dota 2. Сервер на Node.js без фреймворков, интерфейс на React. Вход только через Steam (OpenID 2.0), API-ключ не нужен.
 
-The database is the built-in `node:sqlite`, so you need Node.js 22.13 or newer. Apart from a few npm packages, nothing else has to be installed.
+База данных встроенная, `node:sqlite`, поэтому понадобится Node.js 22.13 или новее. Больше ничего ставить не надо, кроме нескольких npm-пакетов.
 
-## Quick start
+## Быстрый старт
 
 ```sh
 git clone https://github.com/repixey/Rollcore.git
@@ -16,108 +16,109 @@ npm run build
 node server.js
 ```
 
-The site opens at `http://localhost:3000`. The `data/` folder with the database is created on first run.
+Сайт откроется на `http://localhost:3000`. Папка `data/` с базой создастся сама при первом запуске.
 
-The interface is built from `src/` into `public/assets/`. While developing, `npm run watch` is more convenient.
+Интерфейс собирается из `src/` в `public/assets/`. Пока разрабатываете, удобнее `npm run watch`.
 
-## Configuration
+## Настройки
 
-Everything is set through environment variables.
+Всё задаётся переменными окружения.
 
-| Variable | Default | What it does |
+| Переменная | По умолчанию | Что делает |
 |---|---|---|
-| `PORT` | 3000 | server port |
-| `BASE_URL` | `http://localhost:PORT` | the site's address in the browser, Steam sends users back to it after sign-in. With https the cookie automatically gets the Secure flag |
-| `DATA_DIR` | `./data` | `db.sqlite`, the shield key, caches |
-| `TRUST_PROXY` | off | set `1` behind nginx or Cloudflare, otherwise all users look like one IP |
-| `SHIELD` | on | `off` disables the check page and rate limits |
-| `ICONS_DIR` | `data/item-icons` | folder with item icons |
-| `ICONS_FILTER` | on | `0` keeps items without an icon in the catalog |
-| `DEPOSIT_MODE` | off | `mock` for test deposits, a real bot is enabled through `BOT_*` |
-| `ADMIN_TOKEN` | off | enables the admin API, see below |
+| `PORT` | 3000 | порт сервера |
+| `BASE_URL` | `http://localhost:PORT` | адрес сайта в браузере, на него Steam возвращает после входа. Для https cookie автоматически получает флаг Secure |
+| `DATA_DIR` | `./data` | база `db.sqlite`, ключ защиты, кэш |
+| `TRUST_PROXY` | выкл | `1`, если сайт стоит за nginx или Cloudflare, иначе все пользователи будут «одним IP» |
+| `SHIELD` | вкл | `off` отключает страницу проверки и лимиты запросов |
+| `ICONS_DIR` | `data/item-icons` | папка с иконками предметов |
+| `ICONS_FILTER` | вкл | `0` не убирает из каталога предметы без иконки |
+| `DEPOSIT_MODE` | выкл | `mock` для тестового пополнения, настоящий бот включается через `BOT_*` |
+| `ADMIN_TOKEN` | выкл | включает админский API, см. ниже |
 
-## Adapting to your game
+## Настройка под свою игру
 
-Everything that differs between two sites lives in `rollcore.config.js`. Run `npm run build` after editing it.
+Всё, что отличает один сайт от другого, лежит в `rollcore.config.js`. После правки выполните `npm run build`.
 
-| Option | What it does |
+| Параметр | Что делает |
 |---|---|
-| `name` | site name: header, tab titles, footer, trade message |
-| `game` | game used for deposits: `name`, `appid`, `contextid` (Dota 2: 570 and `'2'`) |
-| `telegramUrl` | link for the "Partnership" button |
-| `edge`, `minChance`, `maxChance` | house edge and chance limits |
-| `minPrice`, `sellRate` | catalog price cutoff and the share of the price paid when selling an item to the site |
-| `tierThresholds` | price thresholds for rarity tiers |
+| `name` | название сайта: шапка, заголовки вкладок, подвал, сообщение в трейде |
+| `game` | игра для депозитов: `name`, `appid`, `contextid` (Dota 2: 570 и `'2'`) |
+| `telegramUrl` | ссылка для кнопки «Партнёрство» |
+| `edge`, `minChance`, `maxChance` | комиссия площадки и границы шанса |
+| `minPrice`, `sellRate` | порог цены для каталога и доля цены при продаже предмета сайту |
+| `tierThresholds` | пороги цены для уровней редкости |
 
-To change the catalog, put your CSV into `catalog/source.csv` (rows like `"Game","Item name",price`), run `npm run items` and put icons into `data/item-icons`.
+Чтобы сменить каталог, положите свой CSV в `catalog/source.csv` (строки вида `"Игра","Название предмета",цена`), выполните `npm run items` и положите иконки в `data/item-icons`.
 
-## How it works
+## Как это работает
 
-**Catalog.** Items above $1 live in `catalog/items.json`. The file is generated from `catalog/source.csv` with `npm run items`. The cutoff is `minPrice` in `rollcore.config.js`. If an item drops out of the catalog while sitting in someone's inventory, its value goes back to the owner's balance at startup.
+**Каталог.** Предметы дороже $1 лежат в `catalog/items.json`. Файл собирается из `catalog/source.csv` командой `npm run items`. Порог задаёт `minPrice` в `rollcore.config.js`. Если предмет ушёл из каталога, а лежал у кого-то в инвентаре, при запуске его стоимость возвращается владельцу на баланс.
 
-**Odds.** The formula is in `odds.js`, used by both the server and the browser:
+**Шанс.** Формула в `odds.js`, её используют и сервер, и браузер:
 
 ```
-chance = stake price / target price × (1 − 24%)
+шанс = цена ставки / цена желаемого предмета × (1 − 24%)
 ```
 
-The result is clamped to between 0.01% and 70%. The 24% is the house edge, the `edge` option in `rollcore.config.js` (the chance limits `minChance` and `maxChance` live there too). The chance shown in the UI is the same number that decides the outcome.
+Результат ограничен диапазоном от 0.01% до 70%. Те самые 24% это преимущество сайта, параметр `edge` в `rollcore.config.js` (границы шанса там же: `minChance`, `maxChance`). Показанный шанс и тот, что реально используется для исхода, одно и то же число.
 
-**Stakes.** Money from the balance only, $1 minimum. A stake can't cost more than the target item, the server answers 400. A won item goes to the site inventory, where you can sell it back for balance (`sellRate` in the config, currently 100% of the price) or keep it. A lost stake is gone.
+**Ставки.** Только деньгами с баланса, минимум $1. Ставка не может быть дороже желаемого предмета, сервер ответит 400. Выигранный предмет попадает в инвентарь сайта, его можно продать обратно за баланс (`sellRate` в конфиге, сейчас 100% цены) или оставить. Проигранная ставка сгорает.
 
-**Profiles.** Name and avatar come from the public Steam profile on every sign-in. Each player gets a numeric ID in order of registration. Pages: `/profile` and `/u/<ID>` for profiles, `/players` for a searchable player list. Above the header there's a ticker with the latest drops of real players, refreshed every 8 seconds.
+**Профили.** Ник и аватарка берутся из публичного профиля Steam при каждом входе. У каждого игрока числовой ID по порядку регистрации. Страницы: `/profile` и `/u/<ID>` для профиля, `/players` для списка игроков с поиском. Над шапкой бегущая строка с последними выпадениями настоящих игроков, обновляется раз в 8 секунд.
 
-**Icons.** The server downloads nothing. Drop images into `data/item-icons` and it matches them by item name, case and punctuation don't matter (`Mace of Aeons.png`, `mace_of_aeons.png`). Formats: png, jpg, webp, gif, svg. New files are picked up without a restart. At startup, items without an icon are removed from the catalog and the list goes to `data/icons-report.txt`. If the folder has no images at all, the filter does nothing. The repository ships no icons.
+**Иконки.** Сервер ничего не качает. Кладёте картинки в `data/item-icons`, он подбирает их по названию предмета, регистр и знаки не важны (`Mace of Aeons.png`, `mace_of_aeons.png`). Форматы png, jpg, webp, gif, svg. Новые файлы подхватываются без перезапуска. При старте предметы без иконки убираются из каталога, список лежит в `data/icons-report.txt`. Если в папке нет ни одной картинки, фильтр не работает. В репозитории иконок нет.
 
-**Bot protection.** On the first visit a short animation page, `public/check.html`, is shown, then the server issues a 12-hour cookie. There are also per-IP rate limits per minute: 240 for `/api` and `/auth`, 120 for pages, 1500 for icons. This is a light filter, real DDoS has to be handled at the hosting level. You can put your own animation in `public/img/loader.gif`.
+**Защита от ботов.** При первом заходе показывается страница `public/check.html` с короткой анимацией, потом сервер выдаёт cookie на 12 часов. Плюс лимиты запросов с одного IP в минуту: 240 на `/api` и `/auth`, 120 на страницы, 1500 на иконки. Это лёгкий фильтр, настоящий DDoS нужно резать на уровне хостинга. Свою анимацию можно положить в `public/img/loader.gif`.
 
-## Trade deposits
+## Пополнение через трейд
 
-A player saves their trade URL on `/deposit`, picks items from the catalog and creates a request. The bot sends them a trade offer, and once it's accepted the site inventory is credited with the items the bot actually received, not what was claimed. A request with no answer is closed after 15 minutes. Withdrawing items back is not implemented yet.
+Игрок сохраняет свою trade-ссылку на `/deposit`, выбирает предметы из каталога и создаёт заявку. Бот присылает ему обмен, и когда тот принят, в инвентарь сайта зачисляются те предметы, которые бот реально получил, а не то, что было заявлено. Заявка без ответа закрывается через 15 минут. Вывод предметов обратно пока не реализован.
 
-Modes:
+Режимы:
 
-With no settings, deposits are off. `DEPOSIT_MODE=mock` is a test mode: the trade accepts itself after 8 seconds and nothing is sent to Steam. The real bot runs on `steam-user` and `steam-tradeoffer-manager` and needs `BOT_USERNAME`, `BOT_PASSWORD`, `BOT_SHARED_SECRET` and optionally `BOT_STEAMID`.
+Без настроек пополнение выключено. `DEPOSIT_MODE=mock` включает тестовый режим: трейд принимается сам через 8 секунд, в Steam ничего не уходит. Настоящий бот работает на `steam-user` и `steam-tradeoffer-manager`, нужны `BOT_USERNAME`, `BOT_PASSWORD`, `BOT_SHARED_SECRET` и по желанию `BOT_STEAMID`.
 
-The real mode was written from the libraries' documentation and **has never been run against a live account**. Test it on a separate throwaway bot before accepting anyone's items.
+Настоящий режим написан по документации библиотек и **ни разу не запускался с живым аккаунтом**. Прежде чем принимать чужие предметы, проверьте его на отдельном тестовом боте.
 
-## Admin
+## Админка
 
-`admin.js` gives out and changes balances on a running server. It needs an `ADMIN_TOKEN` of at least 12 characters, without it the admin API answers 404.
+Скрипт `admin.js` выдаёт и меняет балансы на запущенном сервере. Нужен `ADMIN_TOKEN` длиной от 12 символов, без него админский API отвечает 404.
 
 ```sh
-ADMIN_TOKEN=a-long-token node server.js
-ADMIN_TOKEN=a-long-token node admin.js list
-ADMIN_TOKEN=a-long-token node admin.js give <player> 100
-ADMIN_TOKEN=a-long-token node admin.js set <player> 49.99
+ADMIN_TOKEN=длинный-токен node server.js
+ADMIN_TOKEN=длинный-токен node admin.js list
+ADMIN_TOKEN=длинный-токен node admin.js give <игрок> 100
+ADMIN_TOKEN=длинный-токен node admin.js set <игрок> 49.99
 ```
 
-`<player>` is a profile ID, a SteamID64 or part of a name. Requests are only accepted from the same machine and not through a proxy. On a production server it's best not to set `ADMIN_TOKEN` at all.
+`<игрок>` это ID профиля, SteamID64 или часть ника. Запросы принимаются только с той же машины и не через прокси. На боевом сервере лучше вообще не задавать `ADMIN_TOKEN`.
 
-Don't edit `data/db.sqlite` by hand while the server is running, it keeps data in memory and will overwrite your changes.
+Не правьте `data/db.sqlite` руками при работающем сервере, он держит данные в памяти и перезапишет изменения.
 
-## Layout
+## Устройство
 
 ```
-server.js           HTTP server, API, spin and wallet logic
-rollcore.config.js  single engine config
-odds.js             odds formula shared by server and browser
-db.js               SQLite access
-bot.js              Steam bot for deposits
-icons.js            icon lookup and catalog filter
-admin.js            console admin
-build.js            interface build with esbuild
-catalog/             catalog: items.json, source.csv
-src/                React interface
-public/             static files, check page, images
-tools/              catalog build from csv
-deploy/             systemd unit and example settings
-scripts/deploy.sh   server update
+server.js           HTTP-сервер, API, логика спинов и кошелька
+rollcore.config.js  единый конфиг движка
+rollcore.config.js  единый конфиг движка
+odds.js             формула шанса, общая для сервера и браузера
+db.js               работа с SQLite
+bot.js              Steam-бот для пополнения
+icons.js            поиск иконок и фильтр каталога
+admin.js            консольная админка
+build.js            сборка интерфейса через esbuild
+catalog/             каталог: items.json, source.csv
+src/                React-интерфейс
+public/             статика, страница проверки, картинки
+tools/              сборка каталога из csv
+deploy/             unit для systemd и пример настроек
+scripts/deploy.sh   обновление на сервере
 ```
 
-## Deploying on Linux
+## Деплой на Linux
 
-You need Node.js 22.13+, git and, preferably, nginx with https in front.
+Нужны Node.js 22.13+, git и (рекомендуется) nginx с https перед сайтом.
 
 ```sh
 sudo useradd --system --home /opt/rollcore rollcore
@@ -134,18 +135,18 @@ sudo systemctl daemon-reload
 sudo systemctl enable --now rollcore
 ```
 
-Make sure to fix `BASE_URL` in `/etc/rollcore.env`. After that, updates are one command:
+В `/etc/rollcore.env` обязательно поправьте `BASE_URL`. Дальше обновления одной командой:
 
 ```sh
 sudo -u rollcore ./scripts/deploy.sh
 ```
 
-The script pulls changes, installs dependencies, rebuilds the interface and restarts the service. For the `sudo systemctl` calls inside it, the `rollcore` user needs a sudoers rule, or you can run the script as your own user with sudo.
+Скрипт подтягивает изменения, ставит зависимости, пересобирает интерфейс и перезапускает сервис. Для `sudo systemctl` внутри скрипта пользователю `rollcore` нужно разрешение в sudoers, либо запускайте скрипт от своего пользователя с sudo.
 
-## Before running it for real
+## Прежде чем запускать по-настоящему
 
-This is a site with real stakes, so check a few things before launch. The legality of such a service depends on your country, and Steam and Valve have their own rules for bots and trades. The privacy policy text in `src/pages/PrivacyPage.jsx` describes what the site stores today, review it for your own setup. The Telegram link is changed in `src/config.js`, then run `npm run build`. And remember the bot note above: don't point it at live items without testing.
+Это сайт с настоящими ставками, поэтому до запуска стоит проверить несколько вещей. Законность такого сервиса зависит от страны, а правила Steam и Valve для ботов и трейдов отдельно. Текст политики конфиденциальности в `src/pages/PrivacyPage.jsx` написан под то, что сайт хранит сейчас, перепроверьте его под свои условия. Ссылку на Telegram меняют в `src/config.js`, после правки нужен `npm run build`. И не забудьте про бота из раздела выше: на живых предметах без теста его запускать нельзя.
 
 ## API
 
-`GET /api/items`, `GET /api/icon/:id`, `GET /api/me`, `GET /api/feed`, `GET /api/users?q=`, `GET /api/users/:id`, `GET /api/profile`, `POST /api/profile/refresh`, `GET /api/wallet`, `POST /api/trade-url`, `POST /api/deposit`, `POST /api/deposit/cancel`, `POST /api/sell`, `POST /api/spin` with body `{amount, target}`.
+`GET /api/items`, `GET /api/icon/:id`, `GET /api/me`, `GET /api/feed`, `GET /api/users?q=`, `GET /api/users/:id`, `GET /api/profile`, `POST /api/profile/refresh`, `GET /api/wallet`, `POST /api/trade-url`, `POST /api/deposit`, `POST /api/deposit/cancel`, `POST /api/sell`, `POST /api/spin` с телом `{amount, target}`.
